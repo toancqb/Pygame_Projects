@@ -1,3 +1,4 @@
+
 import pygame
 import random
 
@@ -14,6 +15,7 @@ from pygame.locals import (
     QUIT,
 )
 
+pygame.mixer.init()
 pygame.init()
 
 clock = pygame.time.Clock()
@@ -31,8 +33,6 @@ font = pygame.font.SysFont("comicsansms", 40)
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super(Player, self).__init__()
-        #self.surf = pygame.Surface((75, 25))
-        #self.surf.fill((255, 255, 255))
         self.surf = pygame.image.load("jet.png").convert()
         self.surf.set_colorkey((255, 255, 255), RLEACCEL)
         self.rect = self.surf.get_rect()
@@ -40,8 +40,10 @@ class Player(pygame.sprite.Sprite):
     def update(self, pressed_keys):
         if pressed_keys[K_UP]:
             self.rect.move_ip(0, -PLAYER_SPEED)
+            move_up_sound.play()
         if pressed_keys[K_DOWN]:
             self.rect.move_ip(0, PLAYER_SPEED)
+            move_down_sound.play()
         if pressed_keys[K_LEFT]:
             self.rect.move_ip(-PLAYER_SPEED, 0)
         if pressed_keys[K_RIGHT]:
@@ -97,6 +99,18 @@ class Cloud(pygame.sprite.Sprite):
         if self.rect.right < 0:
             self.kill()
 
+# Load and play background music
+# Sound source: http://ccmixter.org/files/Apoxode/59262
+# License: https://creativecommons.org/licenses/by/3.0/
+pygame.mixer.music.load("Apoxode_-_Electric_1.mp3")
+pygame.mixer.music.play(loops=-1)
+
+# Load all sound files
+# Sound sources: Jon Fincher
+move_up_sound = pygame.mixer.Sound("Rising_putter.ogg")
+move_down_sound = pygame.mixer.Sound("Falling_putter.ogg")
+collision_sound = pygame.mixer.Sound("Collision.ogg")
+
 screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
 
 ADDENEMY = pygame.USEREVENT + 1
@@ -140,12 +154,14 @@ while running:
 
     screen.fill((135, 206, 250))
 
-
     #screen.blit(player.surf, player.rect)
     for entity in all_sprites:
         screen.blit(entity.surf, entity.rect)
 
     if pygame.sprite.spritecollideany(player, enemies):
+        move_up_sound.stop()
+        move_down_sound.stop()
+        collision_sound.play()
         player.kill()
         running = False
 
@@ -154,5 +170,6 @@ while running:
     pygame.display.flip()
     clock.tick(30)
 
-
+pygame.mixer.music.stop()
+pygame.mixer.quit()
 pygame.quit()
