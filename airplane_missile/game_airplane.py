@@ -27,7 +27,6 @@ GREEN = (0, 128, 0)
 BLUE = (135, 206, 250)
 RED = (255, 0, 0)
 
-
 class Player(pygame.sprite.Sprite):
     move_up_sound = None
     move_down_sound = None
@@ -87,6 +86,27 @@ class Enemy(pygame.sprite.Sprite):
             SCORE = SCORE + 1
             self.kill()
 
+class Gold(pygame.sprite.Sprite):
+    def __init__(self):
+        super(Gold, self).__init__()
+        g = pygame.image.load("coin_gold.png").convert()
+        g = pygame.transform.scale(g, (32, 32))
+        self.surf = g.convert()
+        self.surf.set_colorkey((255, 255, 255), RLEACCEL)
+        self.rect = self.surf.get_rect(
+            center = (
+                random.randint(SCREEN_WIDTH+20, SCREEN_WIDTH+100),
+                random.randint(0, SCREEN_HEIGHT),
+            )
+        )
+        self.speed = random.randint(ENEMY_SPEED_MIN, ENEMY_SPEED_MAX)
+
+    def update(self):
+        self.rect.move_ip(-self.speed, 0)
+        if self.rect.right < 0:
+            self.kill()
+
+
 class Boss(pygame.sprite.Sprite):
     def __init__(self):
         super(Boss, self).__init__()
@@ -132,24 +152,22 @@ class Game():
     def __init__(self):
 
         # Load and play background music
-        # Sound source: http://ccmixter.org/files/Apoxode/59262
-        # License: https://creativecommons.org/licenses/by/3.0/
+
         pygame.mixer.init()
-        pygame.mixer.music.load("Apoxode_-_Electric_1.mp3")
+        pygame.mixer.music.load("spacetheme.mp3")
         pygame.mixer.music.play(loops=-1)
         # Load all sound files
         # Sound sources: Jon Fincher
         self.move_up_sound = pygame.mixer.Sound("Rising_putter.ogg")
         self.move_down_sound = pygame.mixer.Sound("Falling_putter.ogg")
         self.collision_sound = pygame.mixer.Sound("Collision.ogg")
+        self.gold_sound = pygame.mixer.Sound("dropmetalthing.ogg")
 
         pygame.init()
-        self.font = pygame.font.SysFont("comicsansms", 40)
+        self.font = pygame.font.SysFont("comicsansms", 35)
         self.font2 = pygame.font.SysFont("comicsansms", 72)
 
-
         self.clock = pygame.time.Clock()
-
 
         self.screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
 
@@ -161,6 +179,10 @@ class Game():
 
         self.ADDCLOUD = pygame.USEREVENT + 3
         pygame.time.set_timer(self.ADDCLOUD, 2000)
+
+        self.ADDGOLD = pygame.USEREVENT + 4
+        pygame.time.set_timer(self.ADDGOLD, 5000)
+
         self.highest_score = self.get_highest_score()
         while True:
             global SCORE
@@ -219,13 +241,14 @@ class Game():
             self.clock.tick(30)
 
     def game_play(self):
-
+        global SCORE
         player = Player(self.move_up_sound, self.move_down_sound)
         # Create groups to hold enemy sprites, cloud sprites, and all sprites
         # - enemies is used for collision detection and position updates
         # - clouds is used for position updates
         # - all_sprites is used for rendering
         enemies = pygame.sprite.Group()
+        golds = pygame.sprite.Group()
         clouds = pygame.sprite.Group()
         all_sprites = pygame.sprite.Group()
         all_sprites.add(player)
@@ -249,17 +272,28 @@ class Game():
                     new_cloud = Cloud()
                     clouds.add(new_cloud)
                     all_sprites.add(new_cloud)
+                elif event.type == self.ADDGOLD:
+                    new_gold = Gold()
+                    golds.add(new_gold)
+                    all_sprites.add(new_gold)
 
             pressed_keys = pygame.key.get_pressed()
 
             player.update(pressed_keys)
             enemies.update()
+            golds.update()
             clouds.update()
 
             self.screen.fill(BLUE)
 
             for entity in all_sprites:
                 self.screen.blit(entity.surf, entity.rect)
+
+            for g in golds:
+                if pygame.sprite.collide_rect(player, g):
+                    self.gold_sound.play()
+                    g.kill()
+                    SCORE += 50
 
             if pygame.sprite.spritecollideany(player, enemies):
                 self.move_up_sound.stop()
