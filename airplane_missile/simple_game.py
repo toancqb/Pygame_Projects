@@ -99,6 +99,7 @@ class Cloud(pygame.sprite.Sprite):
         if self.rect.right < 0:
             self.kill()
 
+
 # Load and play background music
 # Sound source: http://ccmixter.org/files/Apoxode/59262
 # License: https://creativecommons.org/licenses/by/3.0/
@@ -173,3 +174,35 @@ while running:
 pygame.mixer.music.stop()
 pygame.mixer.quit()
 pygame.quit()
+
+
+screen.fill(BLUE)
+txt = font2.render("GAME OVER! "+str(SCORE)+" SCORES!", True, RED)
+txt_center = (
+    SCREEN_WIDTH/2 - txt.get_width() // 2,
+    SCREEN_HEIGHT/2 - txt.get_height() // 2
+)
+
+clouds_decor = pygame.sprite.Group()
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == KEYDOWN:
+            if event.key == K_ESCAPE:
+                running = False
+        elif event.type == QUIT:
+            running = False
+        elif event.type == ADDCLOUD:
+            new_cloud = Cloud()
+            clouds_decor.add(new_cloud)
+
+    clouds_decor.update()
+    screen.fill(BLUE)
+
+    screen.blit(txt, txt_center)
+
+    for entity in clouds_decor:
+        screen.blit(entity.surf, entity.rect)
+
+    pygame.display.flip()
+    clock.tick(30)
