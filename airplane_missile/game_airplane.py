@@ -1,7 +1,7 @@
 
 import pygame
 import random
-
+import os.path
 # Import pygame.locals for easier access to key coordinates
 # Updated to conform to flake8 and black standards
 from pygame.locals import (
@@ -26,6 +26,7 @@ SCORE = 0
 GREEN = (0, 128, 0)
 BLUE = (135, 206, 250)
 RED = (255, 0, 0)
+PATH_THEME = os.path.join("srcs", "spacetheme.mp3")
 
 class Player(pygame.sprite.Sprite):
     move_up_sound = None
@@ -34,7 +35,7 @@ class Player(pygame.sprite.Sprite):
         super(Player, self).__init__()
         self.move_up_sound = move_up_sound
         self.move_down_sound = move_down_sound
-        self.surf = pygame.image.load("jet.png").convert()
+        self.surf = pygame.image.load(os.path.join("srcs","jet.png")).convert()
         self.surf.set_colorkey((255, 255, 255), RLEACCEL)
         self.rect = self.surf.get_rect(
             center = (
@@ -69,7 +70,7 @@ class Enemy(pygame.sprite.Sprite):
         super(Enemy, self).__init__()
         #self.surf = pygame.Surface((20, 10))
         #self.surf.fill((255, 255, 255))
-        self.surf = pygame.image.load("missile.png").convert()
+        self.surf = pygame.image.load(os.path.join("srcs","missile.png")).convert()
         self.surf.set_colorkey((255, 255, 255), RLEACCEL)
         self.rect = self.surf.get_rect(
             center = (
@@ -89,7 +90,7 @@ class Enemy(pygame.sprite.Sprite):
 class Gold(pygame.sprite.Sprite):
     def __init__(self):
         super(Gold, self).__init__()
-        g = pygame.image.load("coin_gold.png").convert()
+        g = pygame.image.load(os.path.join("srcs","coin_gold.png")).convert()
         g = pygame.transform.scale(g, (32, 32))
         self.surf = g.convert()
         self.surf.set_colorkey((255, 255, 255), RLEACCEL)
@@ -110,7 +111,7 @@ class Gold(pygame.sprite.Sprite):
 class Boss(pygame.sprite.Sprite):
     def __init__(self):
         super(Boss, self).__init__()
-        self.surf = pygame.image.load("boss.png").convert()
+        self.surf = pygame.image.load(os.path.join("srcs","boss.png")).convert()
         self.surf.set_colorkey((255, 255, 255), RLEACCEL)
         self.rect = self.surf.get_rect(
             center = (
@@ -132,7 +133,7 @@ class Boss(pygame.sprite.Sprite):
 class Cloud(pygame.sprite.Sprite):
     def __init__(self):
         super(Cloud, self).__init__()
-        self.surf = pygame.image.load("cloud.png").convert()
+        self.surf = pygame.image.load(os.path.join("srcs","cloud.png")).convert()
         self.surf.set_colorkey((0, 0, 0), RLEACCEL)
         self.rect = self.surf.get_rect(
             center = (
@@ -154,14 +155,14 @@ class Game():
         # Load and play background music
 
         pygame.mixer.init()
-        pygame.mixer.music.load("spacetheme.mp3")
+        pygame.mixer.music.load(PATH_THEME)
         pygame.mixer.music.play(loops=-1)
         # Load all sound files
         # Sound sources: Jon Fincher
-        self.move_up_sound = pygame.mixer.Sound("Rising_putter.ogg")
-        self.move_down_sound = pygame.mixer.Sound("Falling_putter.ogg")
-        self.collision_sound = pygame.mixer.Sound("Collision.ogg")
-        self.gold_sound = pygame.mixer.Sound("dropmetalthing.ogg")
+        self.move_up_sound = pygame.mixer.Sound(os.path.join("srcs","Rising_putter.ogg"))
+        self.move_down_sound = pygame.mixer.Sound(os.path.join("srcs","Falling_putter.ogg"))
+        self.collision_sound = pygame.mixer.Sound(os.path.join("srcs","Collision.ogg"))
+        self.gold_sound = pygame.mixer.Sound(os.path.join("srcs","dropmetalthing.ogg"))
 
         pygame.init()
         self.font = pygame.font.SysFont("comicsansms", 35)
@@ -302,7 +303,7 @@ class Game():
                 player.kill()
                 running = False
 
-            tmp_txt = "SCORE: ["+str(SCORE)+"]         HIGHEST SCORE OF ALL TIME: -=["+str(self.highest_score)+"]=-"
+            tmp_txt = "SCORE: ["+str(SCORE)+"]              HIGHEST SCORE: -=["+str(self.highest_score)+"]=-"
             txt = self.font.render(tmp_txt, True, GREEN)
             self.screen.blit(txt, (5, 5))
             pygame.display.flip()
@@ -353,15 +354,15 @@ class Game():
     def ck_sv_highest_score(self):
         if SCORE > self.highest_score:
             self.highest_score = SCORE
-            database = open('database.txt', 'w+')
+            database = open(os.path.join("srcs","database.txt"), 'w+')
             database.write(str(SCORE))
             database.close()
 
     def get_highest_score(self):
         try:
-            database = open('database.txt', 'r')
+            database = open(os.path.join("srcs","database.txt"), 'r')
         except (OSError, IOError) as e:
-            database = open('database.txt', 'w+')
+            database = open(os.path.join("srcs","database.txt"), 'w+')
             database.write('0')
 
         try:
