@@ -8,6 +8,196 @@ from define import *
 # Import pygame.locals for easier access to key coordinates
 # Updated to conform to flake8 and black standards
 
+## define.py
+
+from pygame.locals import (
+    RLEACCEL,
+    K_UP,
+    K_DOWN,
+    K_LEFT,
+    K_RIGHT,
+    K_ESCAPE,
+    K_SPACE,
+    KEYDOWN,
+    QUIT,
+)
+
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
+PLAYER_SPEED = 5
+ENEMY_SPEED_MIN = 5
+ENEMY_SPEED_MAX = 20
+CLOUD_SPEED = 4
+BULLET_SPEED = 10
+#SCORE = 0
+GREEN = (0, 128, 0)
+BLUE = (135, 206, 250)
+RED = (255, 0, 0)
+
+##
+
+## class_objects.py
+
+# import pygame
+# import random
+# import os.path
+# import time
+# from define import *
+#
+# SCORE = 0
+
+class Player(pygame.sprite.Sprite):
+    move_up_sound = None
+    move_down_sound = None
+    def __init__(self, move_up_sound, move_down_sound, ):
+        super(Player, self).__init__()
+        self.move_up_sound = move_up_sound
+        self.move_down_sound = move_down_sound
+        self.surf = pygame.image.load(os.path.join("srcs","jet.png")).convert()
+        self.surf.set_colorkey((255, 255, 255), RLEACCEL)
+        self.rect = self.surf.get_rect(
+            center = (
+                100,
+                SCREEN_HEIGHT/2,
+            )
+        )
+
+    def update(self, pressed_keys):
+        if pressed_keys[K_UP]:
+            self.rect.move_ip(0, -PLAYER_SPEED)
+            #self.move_up_sound.play()
+        if pressed_keys[K_DOWN]:
+            self.rect.move_ip(0, PLAYER_SPEED)
+            #self.move_down_sound.play()
+        if pressed_keys[K_LEFT]:
+            self.rect.move_ip(-PLAYER_SPEED, 0)
+        if pressed_keys[K_RIGHT]:
+            self.rect.move_ip(PLAYER_SPEED, 0)
+
+        if self.rect.left < 0:
+            self.rect.left = 0
+        if self.rect.right > SCREEN_WIDTH:
+            self.rect.right = SCREEN_WIDTH
+        if self.rect.top <= 0:
+            self.rect.top = 0
+        if self.rect.bottom >= SCREEN_HEIGHT:
+            self.rect.bottom = SCREEN_HEIGHT
+
+class Enemy(pygame.sprite.Sprite):
+    def __init__(self):
+        super(Enemy, self).__init__()
+        #self.surf = pygame.Surface((20, 10))
+        #self.surf.fill((255, 255, 255))
+        self.surf = pygame.image.load(os.path.join("srcs","missile.png")).convert()
+        self.surf = pygame.transform.scale(self.surf, (30, 15)).convert()
+        self.surf.set_colorkey((255, 255, 255), RLEACCEL)
+        self.rect = self.surf.get_rect(
+            center = (
+                random.randint(SCREEN_WIDTH+20, SCREEN_WIDTH+100),
+                random.randint(0, SCREEN_HEIGHT),
+            )
+        )
+        self.speed = random.randint(ENEMY_SPEED_MIN, ENEMY_SPEED_MAX)
+
+    def update(self):
+        global SCORE
+        self.rect.move_ip(-self.speed, 0)
+        if self.rect.right < 0:
+            SCORE = SCORE + 1
+            self.kill()
+
+class Gold(pygame.sprite.Sprite):
+    def __init__(self):
+        super(Gold, self).__init__()
+        self.surf = pygame.image.load(os.path.join("srcs","coin_gold.png"))
+        self.surf = pygame.transform.scale(self.surf, (32, 32))
+        self.surf.set_colorkey((255, 255, 255), RLEACCEL)
+        self.rect = self.surf.get_rect(
+            center = (
+                random.randint(SCREEN_WIDTH+20, SCREEN_WIDTH+100),
+                random.randint(0, SCREEN_HEIGHT),
+            )
+        )
+        self.speed = random.randint(ENEMY_SPEED_MIN, ENEMY_SPEED_MAX)
+
+    def update(self):
+        self.rect.move_ip(-self.speed, 0)
+        if self.rect.right < 0:
+            self.kill()
+
+
+class Boss(pygame.sprite.Sprite):
+    def __init__(self):
+        super(Boss, self).__init__()
+        self.surf = pygame.image.load(os.path.join("srcs","boss.png")).convert()
+        self.surf.set_colorkey((255, 255, 255), RLEACCEL)
+        self.rect = self.surf.get_rect(
+            center = (
+                random.randint(SCREEN_WIDTH/4, SCREEN_WIDTH),
+                0,
+            )
+        )
+        self.speed = random.randint(ENEMY_SPEED_MAX/4, ENEMY_SPEED_MAX)
+
+    def update(self):
+        global SCORE
+        n = random.randint(0, 20)
+        self.rect.move_ip(-self.speed - n, self.speed)
+        if self.rect.top > SCREEN_HEIGHT or self.rect.right <= 0:
+            SCORE = SCORE + 10
+            self.kill()
+
+
+class Cloud(pygame.sprite.Sprite):
+    def __init__(self):
+        super(Cloud, self).__init__()
+        self.surf = pygame.image.load(os.path.join("srcs","cloud.png")).convert()
+        self.surf.set_colorkey((0, 0, 0), RLEACCEL)
+        self.rect = self.surf.get_rect(
+            center = (
+                random.randint(SCREEN_WIDTH+20, SCREEN_WIDTH+100),
+                random.randint(0, SCREEN_HEIGHT),
+            )
+        )
+        self.speed = CLOUD_SPEED
+
+    def update(self):
+        self.rect.move_ip(-self.speed, 0)
+        if self.rect.right < 0:
+            self.kill()
+
+class Explosion(pygame.sprite.Sprite):
+    def __init__(self, rect):
+        super(Explosion, self).__init__()
+        self.surf = pygame.image.load(os.path.join("srcs", "explosion2.png"))
+        self.surf = pygame.transform.scale(self.surf, (64, 64))
+        self.rect = rect
+        self.timer = 10 # after 10 frames, it will be destroyed
+
+    def process(self):
+        if self.timer < 0:
+            self.kill()
+
+    def update_timer(self):
+        self.timer = self.timer - 1
+
+    def update(self):
+        self.rect.move_ip(BULLET_SPEED)
+
+class Bullet(pygame.sprite.Sprite):
+    def __init__(self, rect):
+        super(Bullet, self).__init__()
+        self.surf = pygame.image.load(os.path.join("srcs", "bullet.png")).convert()
+        self.surf.set_colorkey((255, 255, 255), RLEACCEL)
+        self.rect = rect
+        self.speed = BULLET_SPEED
+
+    def update(self):
+        self.rect.move_ip(self.speed, 0)
+        if self.rect.left > SCREEN_WIDTH:
+            self.kill()
+
+##
 
 class Game():
 
@@ -45,8 +235,8 @@ class Game():
         pygame.time.set_timer(self.ADDGOLD, 5000)
 
         self.highest_score = self.get_highest_score()
+        global SCORE
         while True:
-            global SCORE
             self.replay = False
             SCORE = 0
             self.menu()
@@ -76,6 +266,7 @@ class Game():
         )
 
         clouds_decor = pygame.sprite.Group()
+        clouds_decor.add(Cloud())
         clouds_decor.add(Cloud())
         running = True
         while running:
@@ -112,6 +303,7 @@ class Game():
         golds = pygame.sprite.Group()
         clouds = pygame.sprite.Group()
         bullets = pygame.sprite.Group()
+        explosions = pygame.sprite.Group()
         all_sprites = pygame.sprite.Group()
         all_sprites.add(player)
         running = True
@@ -150,6 +342,9 @@ class Game():
             bullets.update()
             golds.update()
             clouds.update()
+            for e in explosions:
+                e.update_timer()
+                e.process()
 
             self.screen.fill(BLUE)
 
@@ -177,7 +372,8 @@ class Game():
             for bullet in pygame.sprite.groupcollide(bullets, enemies, True, True):
                 self.collision_sound.play()
                 expl = Explosion(bullet.rect.copy())
-                self.screen.blit(expl.surf, expl.rect)
+                explosions.add(expl)
+                all_sprites.add(expl)
 
             tmp_txt = "SCORE: ["+str(SCORE)+"]              HIGHEST SCORE: -=["+str(self.highest_score)+"]=-"
             txt = self.font.render(tmp_txt, True, GREEN)
@@ -186,6 +382,7 @@ class Game():
             self.clock.tick(30)
 
     def game_over(self):
+        global SCORE
         self.screen.fill(BLUE)
         txt = self.font2.render("GAME OVER! ["+str(SCORE)+"] SCORES!", True, RED)
         txt_center = (
@@ -200,6 +397,7 @@ class Game():
         )
 
         clouds_decor = pygame.sprite.Group()
+        clouds_decor.add(Cloud())
         clouds_decor.add(Cloud())
         running = True
         while running:
@@ -227,18 +425,8 @@ class Game():
             pygame.display.flip()
             self.clock.tick(30)
 
-    # def player_collision_enemies(self, player, enemies):
-    #     if pygame.sprite.spritecollideany(player, enemies):
-    #         self.move_up_sound.stop()
-    #         self.move_down_sound.stop()
-    #         self.collision_sound.play()
-    #         expl = Explosion(player.rect)
-    #         self.screen.blit(expl.surf, expl.rect)
-    #         pygame.display.flip()
-    #         time.sleep(5)
-    #         player.kill()
-
     def ck_sv_highest_score(self):
+        global SCORE
         if SCORE > self.highest_score:
             self.highest_score = SCORE
             database = open(os.path.join("srcs",".database.txt"), 'w+')
