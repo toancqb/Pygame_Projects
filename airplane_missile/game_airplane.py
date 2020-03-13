@@ -167,7 +167,7 @@ class Game():
         # Sound sources: Jon Fincher
         self.move_up_sound = pygame.mixer.Sound(os.path.join("srcs","Rising_putter.ogg"))
         self.move_down_sound = pygame.mixer.Sound(os.path.join("srcs","Falling_putter.ogg"))
-        self.collision_sound = pygame.mixer.Sound(os.path.join("srcs","Collision.ogg"))
+        self.collision_sound = pygame.mixer.Sound(os.path.join("srcs","explosion.wav"))
         self.gold_sound = pygame.mixer.Sound(os.path.join("srcs","dropmetalthing.ogg"))
 
         pygame.init()
@@ -306,6 +306,7 @@ class Game():
                 self.move_up_sound.stop()
                 self.move_down_sound.stop()
                 self.collision_sound.play()
+                print("zzzzz", player.rect)
                 expl = Explosion(player.rect)
                 self.screen.blit(expl.surf, expl.rect)
                 player.kill()
