@@ -2,6 +2,7 @@
 import pygame
 import random
 import os.path
+import time
 # Import pygame.locals for easier access to key coordinates
 # Updated to conform to flake8 and black standards
 from pygame.locals import (
@@ -90,9 +91,8 @@ class Enemy(pygame.sprite.Sprite):
 class Gold(pygame.sprite.Sprite):
     def __init__(self):
         super(Gold, self).__init__()
-        g = pygame.image.load(os.path.join("srcs","coin_gold.png")).convert()
-        g = pygame.transform.scale(g, (32, 32))
-        self.surf = g.convert()
+        self.surf = pygame.image.load(os.path.join("srcs","coin_gold.png"))
+        self.surf = pygame.transform.scale(self.surf, (32, 32))
         self.surf.set_colorkey((255, 255, 255), RLEACCEL)
         self.rect = self.surf.get_rect(
             center = (
@@ -148,12 +148,18 @@ class Cloud(pygame.sprite.Sprite):
         if self.rect.right < 0:
             self.kill()
 
+class Explosion(pygame.sprite.Sprite):
+    def __init__(self, rect):
+        super(Explosion, self).__init__()
+        self.surf = pygame.image.load(os.path.join("srcs", "explosion2.png"))
+        self.surf = pygame.transform.scale(self.surf, (64, 64))
+        self.rect = rect
+
 class Game():
 
     def __init__(self):
 
         # Load and play background music
-
         pygame.mixer.init()
         pygame.mixer.music.load(PATH_THEME)
         pygame.mixer.music.play(loops=-1)
@@ -300,7 +306,12 @@ class Game():
                 self.move_up_sound.stop()
                 self.move_down_sound.stop()
                 self.collision_sound.play()
+                expl = Explosion(player.rect)
+                self.screen.blit(expl.surf, expl.rect)
                 player.kill()
+                pygame.display.flip()
+                time.sleep(3)
+
                 running = False
 
             tmp_txt = "SCORE: ["+str(SCORE)+"]              HIGHEST SCORE: -=["+str(self.highest_score)+"]=-"
@@ -351,18 +362,29 @@ class Game():
             pygame.display.flip()
             self.clock.tick(30)
 
+    # def player_collision_enemies(self, player, enemies):
+    #     if pygame.sprite.spritecollideany(player, enemies):
+    #         self.move_up_sound.stop()
+    #         self.move_down_sound.stop()
+    #         self.collision_sound.play()
+    #         expl = Explosion(player.rect)
+    #         self.screen.blit(expl.surf, expl.rect)
+    #         pygame.display.flip()
+    #         time.sleep(5)
+    #         player.kill()
+
     def ck_sv_highest_score(self):
         if SCORE > self.highest_score:
             self.highest_score = SCORE
-            database = open(os.path.join("srcs","database.txt"), 'w+')
+            database = open(os.path.join("srcs",".database.txt"), 'w+')
             database.write(str(SCORE))
             database.close()
 
     def get_highest_score(self):
         try:
-            database = open(os.path.join("srcs","database.txt"), 'r')
+            database = open(os.path.join("srcs",".database.txt"), 'r')
         except (OSError, IOError) as e:
-            database = open(os.path.join("srcs","database.txt"), 'w+')
+            database = open(os.path.join("srcs",".database.txt"), 'w+')
             database.write('0')
 
         try:
