@@ -4,8 +4,6 @@ import os.path
 import time
 from define import *
 
-SCORE = 0
-
 class Player(pygame.sprite.Sprite):
     move_up_sound = None
     move_down_sound = None
@@ -63,7 +61,7 @@ class Enemy(pygame.sprite.Sprite):
         global SCORE
         self.rect.move_ip(-self.speed, 0)
         if self.rect.right < 0:
-            SCORE = SCORE + 1
+            SCORE[0] = SCORE[0] + 1
             self.kill()
 
 class Gold(pygame.sprite.Sprite):
@@ -104,7 +102,7 @@ class Boss(pygame.sprite.Sprite):
         n = random.randint(0, 20)
         self.rect.move_ip(-self.speed - n, self.speed)
         if self.rect.top > SCREEN_HEIGHT or self.rect.right <= 0:
-            SCORE = SCORE + 10
+            SCORE[0] = SCORE[0] + 10
             self.kill()
 
 
@@ -133,6 +131,7 @@ class Explosion(pygame.sprite.Sprite):
         self.surf = pygame.transform.scale(self.surf, (64, 64))
         self.rect = rect
         self.timer = 10 # after 10 frames, it will be destroyed
+        self.speed = BULLET_SPEED
 
     def process(self):
         if self.timer < 0:
@@ -142,7 +141,7 @@ class Explosion(pygame.sprite.Sprite):
         self.timer = self.timer - 1
 
     def update(self):
-        self.rect.move_ip(BULLET_SPEED)
+        self.rect.move_ip(-self.speed, 0)
 
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, rect):
