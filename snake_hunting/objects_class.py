@@ -50,8 +50,9 @@ class Snake(pygame.sprite.Sprite):
 
 class Snakes(pygame.sprite.Sprite):
 
-    def __init__(self):
+    def __init__(self, all_sprites):
         super(Snakes, self).__init__()
+        self.all_sprites = all_sprites
         self.head = Snake((0,0), 1, (SQ_SIZE, 0))
         self.group = [self.head]
         self.len = 1
@@ -64,6 +65,7 @@ class Snakes(pygame.sprite.Sprite):
         self.group.insert(0, new_snake)
         self.len += 1
         self.head = new_snake
+        self.all_sprites.add(new_snake)
 
     def update(self, pressed_keys):
         i = self.len-1
@@ -80,9 +82,9 @@ class Wall(pygame.sprite.Sprite):
 
     def __init__(self):
         super(Wall, self).__init__()
-        self.surf = pygame.Surface((SQ_SIZE,SQ_SIZE*10))
+        self.surf = pygame.Surface((SQ_SIZE*10,SQ_SIZE*2))
         self.surf.fill(ORANGE)
-        pygame.draw.rect(self.surf,WHITE, (2, 2, SQ_SIZE-4, SQ_SIZE-4))
+        pygame.draw.rect(self.surf,WHITE, (2, 2, 10*SQ_SIZE-4, 2*SQ_SIZE-4))
         self.rect = self.surf.get_rect(
             center = (SCREEN_WIDTH/2,
                       SCREEN_HEIGHT/2)

@@ -16,10 +16,17 @@ class Game():
         pygame.time.set_timer(self.ADDFRUIT, 50000)
 
         fruits = pygame.sprite.Group()
-        fruits.add(Fruit())
-        # snakes_sprite_group = pygame.sprite.Group()
+        fr = Fruit()
+        fruits.add(fr)
+        walls = pygame.sprite.Group()
+        wl = Wall()
+        walls.add(wl)
 
-        snakes = Snakes()
+        all_sprites = pygame.sprite.Group()
+        all_sprites.add(fr)
+        all_sprites.add(wl)
+
+        snakes = Snakes(all_sprites)
         snakes.add_snake()
         snakes.add_snake()
         snakes.add_snake()
@@ -27,8 +34,6 @@ class Game():
         snakes.add_snake()
         snakes.add_snake()
 
-        wall = Wall()
-        fruits.add(wall)
         opt = True
         running = True
         while running:
@@ -43,28 +48,26 @@ class Game():
                     fruits.add(new_fruit)
             pressed_keys = pygame.key.get_pressed()
 
-            self.draw_board(None, None, None)
+            self.draw_board()
             if opt:
                 snakes.update(pressed_keys)
             for snake in snakes.group:
-
                 for fruit in fruits:
                     if pygame.sprite.collide_rect(snake, fruit):
                         fruit.kill()
                         new_fruit = Fruit()
                         fruits.add(new_fruit)
+                        all_sprites.add(new_fruit)
                         snakes.add_snake()
-                self.screen.blit(snake.surf, snake.rect)
 
-            for fruit in fruits:
-                self.screen.blit(fruit.surf, fruit.rect)
-            i = 1
-            while i < snakes.len:
-                if snakes.head.rect.colliderect(snakes.group[i]):
+                if (snake != snakes.head and snakes.head.rect.colliderect(snake))\
+                or pygame.sprite.spritecollideany(snake, walls):
                     expl = Explosion(snakes.head.rect.copy())
                     opt = False
                     break
-                i += 1
+            for fw in all_sprites:
+                self.screen.blit(fw.surf, fw.rect)
+
             if not opt:
                 self.screen.blit(expl.surf, expl.rect)
             pygame.display.flip()
@@ -73,7 +76,7 @@ class Game():
 
         pygame.quit()
 
-    def draw_board(self, lst_snake, fruit, wall):
+    def draw_board(self):
         self.screen.fill(BLACK)
 
 

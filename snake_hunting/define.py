@@ -12,8 +12,8 @@ from pygame.locals import (
 )
 
 SQ_SIZE = 20
-NX = 40
-NY = 30
+NX = 50 # 25 50
+NY = 40
 SCREEN_WIDTH = SQ_SIZE * NX
 SCREEN_HEIGHT = SQ_SIZE * NY
 GAME_SPEED = 10
