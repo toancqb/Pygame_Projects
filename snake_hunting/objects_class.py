@@ -127,20 +127,8 @@ class Fruit(pygame.sprite.Sprite):
         self.surf.fill(ORANGE)
         pygame.draw.rect(self.surf,RED, (2, 2, SQ_SIZE-4, SQ_SIZE-4))
         self.rect = self.surf.get_rect(
-            center = (random.randint(0,self.SCREEN_WIDTH-2)+SQ_SIZE/2,
-                      random.randint(0,SCREEN_HEIGHT-2)+SQ_SIZE/2)
-        )
-
-class Fruits(pygame.sprite.Sprite):
-    def __init__(self, scr_width):
-        super(Fruits, self).__init__()
-        self.SCREEN_WIDTH = scr_width
-        self.surf = pygame.Surface((SQ_SIZE,SQ_SIZE))
-        self.surf.fill(ORANGE)
-        pygame.draw.rect(self.surf,RED, (2, 2, SQ_SIZE-4, SQ_SIZE-4))
-        self.rect = self.surf.get_rect(
-            center = (random.randint(0,self.SCREEN_WIDTH-2)+SQ_SIZE/2,
-                      random.randint(0,SCREEN_HEIGHT-2)+SQ_SIZE/2)
+            center = (random.randint(SQ_SIZE,self.SCREEN_WIDTH-SQ_SIZE),
+                      random.randint(SQ_SIZE,SCREEN_HEIGHT-SQ_SIZE))
         )
 
 
