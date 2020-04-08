@@ -7,12 +7,17 @@ from pygame.locals import (
     K_LEFT,
     K_RIGHT,
     K_ESCAPE,
+    K_w,
+    K_s,
+    K_a,
+    K_d,
     KEYDOWN,
+    MOUSEBUTTONDOWN,
     QUIT,
 )
 
 SQ_SIZE = 20
-NX = 50 # 25 50
+NX = 40 # 25 50
 NY = 40
 SCREEN_WIDTH = SQ_SIZE * NX
 SCREEN_HEIGHT = SQ_SIZE * NY
