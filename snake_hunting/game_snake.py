@@ -214,10 +214,10 @@ class Game():
             pressed_keys = pygame.key.get_pressed()
 
             self.draw_board(screen1, BLACK)
-            self.draw_board(screen2, GRIS)
+            self.draw_board(screen2, BLUE_D)
 ####################################
             if opt:
-                snakes.update(pressed_keys, 1)
+                snakes.update(pressed_keys, 2)
             for snake in snakes.group:
                 for fruit in fruits:
                     if pygame.sprite.collide_rect(snake, fruit):
@@ -225,6 +225,7 @@ class Game():
                         new_fruit = Fruit(SCREEN_WIDTH//2)
                         fruits.add(new_fruit)
                         all_sprites.add(new_fruit)
+                        all_sprites2.add(new_fruit)
                         snakes.add_snake()
 
                 if (snake != snakes.head and snakes.head.rect.colliderect(snake))\
@@ -239,7 +240,7 @@ class Game():
                 screen1.blit(expl.surf, expl.rect)
 #################################
             if opt2:
-                snakes2.update(pressed_keys, 2)
+                snakes2.update(pressed_keys, 1)
             for snake in snakes2.group:
                 for fruit in fruits:
                     if pygame.sprite.collide_rect(snake, fruit):
@@ -247,6 +248,7 @@ class Game():
                         new_fruit = Fruit(SCREEN_WIDTH//2)
                         fruits.add(new_fruit)
                         all_sprites.add(new_fruit)
+                        all_sprites2.add(new_fruit)
                         snakes2.add_snake()
 
                 if (snake != snakes2.head and snakes2.head.rect.colliderect(snake))\
