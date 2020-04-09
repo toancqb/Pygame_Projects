@@ -72,11 +72,11 @@ class Snake(pygame.sprite.Sprite):
 
 class Snakes(pygame.sprite.Sprite):
 
-    def __init__(self, all_sprites, scr_width):
+    def __init__(self, all_sprites, scr_width, rect_pos):
         super(Snakes, self).__init__()
         self.SCREEN_WIDTH = scr_width
         self.all_sprites = all_sprites
-        self.head = Snake((0,0), 1, (SQ_SIZE, 0), self.SCREEN_WIDTH)
+        self.head = Snake(rect_pos, 1, (SQ_SIZE, 0), self.SCREEN_WIDTH)
         self.group = [self.head]
         self.len = 1
 
@@ -86,6 +86,11 @@ class Snakes(pygame.sprite.Sprite):
         rect = self.head.rect
         rect = (rect[0]+self.head.goto[0], rect[1]+self.head.goto[1], rect[2], rect[3])
         new_snake = Snake(rect, self.len, self.head.goto, self.SCREEN_WIDTH)
+        new_snake.surf.fill(RED)
+        pygame.draw.rect(new_snake.surf,ORANGE, (1, 1, SQ_SIZE-2, SQ_SIZE-2))
+        self.head.surf.fill(WHITE)
+        pygame.draw.rect(self.head.surf,GREEN, (1, 1, SQ_SIZE-2, SQ_SIZE-2))
+
         self.group.insert(0, new_snake)
         self.len += 1
         self.head = new_snake
@@ -138,6 +143,15 @@ class Explosion(pygame.sprite.Sprite):
         self.surf = pygame.image.load(os.path.join("srcs", "explosion2.png"))
         self.surf = pygame.transform.scale(self.surf, (64, 64))
         self.rect = rect
+        self.timer = 10
+
+    def process(self):
+        if self.timer < 0:
+            self.kill()
+
+    def update(self):
+        self.timer = self.timer - 1
+        self.process()
 
 class Cloud(pygame.sprite.Sprite):
     def __init__(self, scr_width):
