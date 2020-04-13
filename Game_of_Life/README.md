@@ -10,3 +10,5 @@ $>python3 game_of_life.py
 
 - You have to click and create the lives as you want
 - Then press "SPACE" to begin the circle of Life
+
+In memories of John Horton Conway, Rest In Peace
