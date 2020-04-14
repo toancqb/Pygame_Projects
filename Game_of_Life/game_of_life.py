@@ -80,8 +80,8 @@ class Game():
 						opt = True
 				if event.type == pygame.MOUSEBUTTONDOWN:
 					if pygame.mouse.get_pressed()[0]:
-						pos_clicked = rev_rect(pygame.mouse.get_pos())
-						board.ar[pos_clicked[0]][pos_clicked[1]] = 1
+						p = rev_rect(pygame.mouse.get_pos())
+						board.ar[p[0]][p[1]] = 1 - board.ar[p[0]][p[1]]
 			self.screen.fill(WHITE)
 			board.draw()
 			if opt:
