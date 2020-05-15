@@ -1,4 +1,9 @@
-
+###############################
+## Author: TRAN Quang Toan   ##
+## Project Game Snake        ##
+## Version 1                 ##
+## 25 Apr 2020               ##
+###############################
 
 from pygame.locals import (
     RLEACCEL,

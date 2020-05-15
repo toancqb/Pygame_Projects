@@ -1,3 +1,10 @@
+###############################
+## Author: TRAN Quang Toan   ##
+## Project Game Snake        ##
+## Version 1                 ##
+## 25 Apr 2020               ##
+###############################
+
 import pygame
 import random
 import os.path
