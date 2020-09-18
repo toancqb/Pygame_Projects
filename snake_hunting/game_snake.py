@@ -1,10 +1,3 @@
-###############################
-## Author: TRAN Quang Toan   ##
-## Project Game Snake        ##
-## Version 1                 ##
-## 25 Apr 2020               ##
-###############################
-
 import pygame
 import random
 import time
@@ -148,13 +141,10 @@ class Game():
         all_sprites.add(wl)
 
         snakes = Snakes(all_sprites, SCREEN_WIDTH,(0,0))
-        snakes.add_snake()
-        snakes.add_snake()
-        snakes.add_snake()
-        snakes.add_snake()
-        snakes.add_snake()
-        snakes.add_snake()
+        for i in range(6):
+            snakes.add_snake()
 
+        count, timer = 0, 0
         opt = True
         running = True
         while running:
@@ -168,10 +158,24 @@ class Game():
                     new_fruit = Fruit(SCREEN_WIDTH)
                     fruits.add(new_fruit)
             pressed_keys = pygame.key.get_pressed()
-
+            
             self.draw_board(self.screen, BLACK)
             if opt:
-                snakes.update(pressed_keys, 1)
+                snakes.update(pressed_keys, 1, timer)
+                        
+            count += 1
+            if count > GAME_SPEED//3:
+                count = 0
+                timer = 1 - timer
+                if snakes.head.goto == (0, -SQ_SIZE):
+                    snakes.head.surf.blit(snakes.head_surfs[0][timer], (0,0))
+                elif snakes.head.goto == (0, SQ_SIZE):
+                    snakes.head.surf.blit(snakes.head_surfs[1][timer], (0,0))
+                elif snakes.head.goto == (-SQ_SIZE, 0):
+                    snakes.head.surf.blit(snakes.head_surfs[2][timer], (0,0))
+                else:
+                    snakes.head.surf.blit(snakes.head_surfs[3][timer], (0,0))
+
             for snake in snakes.group:
                 for fruit in fruits:
                     if pygame.sprite.collide_rect(snake, fruit):
@@ -186,11 +190,14 @@ class Game():
                     expl = Explosion(snakes.head.rect.copy())
                     opt = False
                     break
+            
+
             for fw in all_sprites:
                 self.screen.blit(fw.surf, fw.rect)
 
             if not opt:
                 self.screen.blit(expl.surf, expl.rect)
+            
             pygame.display.flip()
             self.clock.tick(GAME_SPEED)
 
@@ -212,19 +219,15 @@ class Game():
         all_sprites2.add(wl)
 
         snakes = Snakes(all_sprites, SCREEN_WIDTH//2, (0,0))
-        snakes.add_snake()
-        snakes.add_snake()
-        snakes.add_snake()
-        snakes.add_snake()
+        for i in range(4):
+            snakes.add_snake()
 
         snakes2 = Snakes(all_sprites2, SCREEN_WIDTH//2, (0,0))
-        snakes2.add_snake()
-        snakes2.add_snake()
-        snakes2.add_snake()
-        snakes2.add_snake()
+        for i in range(4):
+            snakes2.add_snake()
 
         opt = True
-        opt2 = True
+        opt2, count, count2, timer, timer2 = True, 0, 0, 1, 1
         running = True
         while running:
             for event in pygame.event.get():
@@ -242,7 +245,7 @@ class Game():
             self.draw_board(screen2, BLUE_D)
 ####################################
             if opt:
-                snakes.update(pressed_keys, 2)
+                snakes.update(pressed_keys, 2, timer)
             for snake in snakes.group:
                 for fruit in fruits:
                     if pygame.sprite.collide_rect(snake, fruit):
@@ -258,6 +261,18 @@ class Game():
                     expl = Explosion(snakes.head.rect.copy())
                     opt = False
                     break
+            count += 1
+            if count > GAME_SPEED//3:
+                count = 0
+                timer = 1 - timer
+                if snakes.head.goto == (0, -SQ_SIZE):
+                    snakes.head.surf.blit(snakes.head_surfs[0][timer], (0,0))
+                elif snakes.head.goto == (0, SQ_SIZE):
+                    snakes.head.surf.blit(snakes.head_surfs[1][timer], (0,0))
+                elif snakes.head.goto == (-SQ_SIZE, 0):
+                    snakes.head.surf.blit(snakes.head_surfs[2][timer], (0,0))
+                else:
+                    snakes.head.surf.blit(snakes.head_surfs[3][timer], (0,0))
             for fw in all_sprites:
                 screen1.blit(fw.surf, fw.rect)
 
@@ -265,7 +280,7 @@ class Game():
                 screen1.blit(expl.surf, expl.rect)
 #################################
             if opt2:
-                snakes2.update(pressed_keys, 1)
+                snakes2.update(pressed_keys, 1, timer2)
             for snake in snakes2.group:
                 for fruit in fruits:
                     if pygame.sprite.collide_rect(snake, fruit):
@@ -281,6 +296,18 @@ class Game():
                     expl = Explosion(snakes2.head.rect.copy())
                     opt2 = False
                     break
+            count2 += 1
+            if count2 > GAME_SPEED//3:
+                count2 = 0
+                timer2 = 1 - timer2
+                if snakes2.head.goto == (0, -SQ_SIZE):
+                    snakes2.head.surf.blit(snakes2.head_surfs[0][timer2], (0,0))
+                elif snakes2.head.goto == (0, SQ_SIZE):
+                    snakes2.head.surf.blit(snakes2.head_surfs[1][timer2], (0,0))
+                elif snakes2.head.goto == (-SQ_SIZE, 0):
+                    snakes2.head.surf.blit(snakes2.head_surfs[2][timer2], (0,0))
+                else:
+                    snakes2.head.surf.blit(snakes2.head_surfs[3][timer2], (0,0))
             for fw in all_sprites2:
                 screen2.blit(fw.surf, fw.rect)
 
@@ -289,6 +316,7 @@ class Game():
 
             self.screen.blit(screen1, (0,0))
             self.screen.blit(screen2, (SCREEN_WIDTH//2,0))
+            
             pygame.display.flip()
             self.clock.tick(GAME_SPEED)
 
@@ -299,38 +327,27 @@ class Game():
         walls = pygame.sprite.Group()
         wl = Wall(SCREEN_WIDTH)
         walls.add(wl)
+        bullets = pygame.sprite.Group()
+        expls = pygame.sprite.Group()
 
         all_sprites = pygame.sprite.Group()
         all_sprites.add(fr)
         all_sprites.add(wl)
 
+
         snakes = Snakes(all_sprites, SCREEN_WIDTH,(0,0))
-        snakes.add_snake()
-        snakes.add_snake()
-        snakes.add_snake()
-        snakes.add_snake()
-        snakes.add_snake()
-        snakes.add_snake()
-        snakes.add_snake()
-        snakes.add_snake()
-        snakes.add_snake()
+       
+        for i in range(9):
+            snakes.add_snake()
 
-        snakes2 = Snakes(all_sprites, SCREEN_WIDTH,(0,SCREEN_HEIGHT-SQ_SIZE))
-        snakes2.add_snake()
-        snakes2.add_snake()
-        snakes2.add_snake()
-        snakes2.add_snake()
-        snakes2.add_snake()
-        snakes2.add_snake()
-        snakes2.add_snake()
-        snakes2.add_snake()
-        snakes2.add_snake()
-
-        sd = False
-        sd2 = False
-        opt = True
-        opt2 = True
-        running = True
+        snakes2 = Snakes(all_sprites, SCREEN_WIDTH,(SCREEN_WIDTH-4*SQ_SIZE,SCREEN_HEIGHT-SQ_SIZE))
+        snakes2.head.goto = (-SQ_SIZE,0)
+        for i in range(9):
+            snakes2.add_snake()
+       
+        sd, count, timer, count2, timer2, bullet_count, bullet_count2 = False, 0, 0, 0, 0, 0, 0
+        got_hit, got_hit2 = False, False
+        sd2, opt, opt2, running = False, True, True, True
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -338,16 +355,34 @@ class Game():
                 if event.type == KEYDOWN:
                     if event.key == K_ESCAPE:
                         running = False
+                    if bullet_count2 == 0 and event.key == K_l:
+                        new_bullet = Bullet(fire_bullet(snakes2, snakes2.head.rect.copy()), snakes2.head.goto)
+                        bullets.add(new_bullet)
+                        all_sprites.add(new_bullet)
+                        bullet_count2 = 1
+                    if bullet_count == 0 and event.key == K_SPACE:
+                        new_bullet = Bullet(fire_bullet(snakes, snakes.head.rect.copy()), snakes.head.goto)
+                        bullets.add(new_bullet)
+                        all_sprites.add(new_bullet) 
+                        bullet_count = 1                       
                 if event.type == self.ADDFRUIT:
                     new_fruit = Fruit(SCREEN_WIDTH)
                     fruits.add(new_fruit)
             pressed_keys = pygame.key.get_pressed()
 
             self.draw_board(self.screen, BLACK)
+            for bullet in bullets:
+                bullet.update()
 
             if opt:
-                snakes.update(pressed_keys, 2)
+                snakes.update(pressed_keys, 2, timer)
                 for snake in snakes.group:
+                    if snake != snakes.head and pygame.sprite.spritecollideany(snake, bullets):                        
+                        expl = Explosion(snake.rect.copy())
+                        expls.add(expl)
+                        all_sprites.add(expl)
+                        got_hit = True
+
                     for fruit in fruits:
                         if pygame.sprite.collide_rect(snake, fruit):
                             fruit.kill()
@@ -355,22 +390,51 @@ class Game():
                             fruits.add(new_fruit)
                             all_sprites.add(new_fruit)
                             snakes.add_snake()
-
+                    
+                    
                     if (snake != snakes.head and snakes.head.rect.colliderect(snake))\
                     or pygame.sprite.spritecollideany(snake, walls)\
                     or snakes2.head.rect.colliderect(snake):
                         expl = Explosion(snakes.head.rect.copy())
+                        expls.add(expl)
                         all_sprites.add(expl)
                         sd = True
                         break
+                    
+            count += 1
+            if bullet_count >= 1:
+                bullet_count += 1
+            if bullet_count2 >= 1:
+                bullet_count2 += 1
+            if bullet_count > 30:
+                bullet_count = 0
+            if bullet_count2 > 30:
+                bullet_count2 = 0
+            if count > GAME_SPEED//3:
+                count = 0
+                timer = 1 - timer
+                if snakes.head.goto == (0, -SQ_SIZE):
+                    snakes.head.surf.blit(snakes.head_surfs[0][timer], (0,0))
+                elif snakes.head.goto == (0, SQ_SIZE):
+                    snakes.head.surf.blit(snakes.head_surfs[1][timer], (0,0))
+                elif snakes.head.goto == (-SQ_SIZE, 0):
+                    snakes.head.surf.blit(snakes.head_surfs[2][timer], (0,0))
+                else:
+                    snakes.head.surf.blit(snakes.head_surfs[3][timer], (0,0))
             if sd:
                 for snake in snakes.group:
                     snake.kill()
                 opt, sd = False, False
 #################################
             if opt2:
-                snakes2.update(pressed_keys, 1)
+                snakes2.update(pressed_keys, 1, timer)
                 for snake in snakes2.group:
+                    if snake != snakes2.head and pygame.sprite.spritecollideany(snake, bullets):                        
+                        expl = Explosion(snake.rect.copy())
+                        expls.add(expl)
+                        all_sprites.add(expl)
+                        got_hit2 = True
+
                     for fruit in fruits:
                         if pygame.sprite.collide_rect(snake, fruit):
                             fruit.kill()
@@ -378,21 +442,46 @@ class Game():
                             fruits.add(new_fruit)
                             all_sprites.add(new_fruit)
                             snakes2.add_snake()
-
+                    
                     if (snake != snakes2.head and snakes2.head.rect.colliderect(snake))\
                     or pygame.sprite.spritecollideany(snake, walls)\
                     or snakes.head.rect.colliderect(snake):
                         expl = Explosion(snakes2.head.rect.copy())
+                        expls.add(expl)
                         all_sprites.add(expl)
                         sd2 = True
                         break
+            count2 += 1
+            if count2 > GAME_SPEED//3:
+                count2 = 0
+                timer2 = 1 - timer2
+                if snakes2.head.goto == (0, -SQ_SIZE):
+                    snakes2.head.surf.blit(snakes2.head_surfs[0][timer2], (0,0))
+                elif snakes2.head.goto == (0, SQ_SIZE):
+                    snakes2.head.surf.blit(snakes2.head_surfs[1][timer2], (0,0))
+                elif snakes2.head.goto == (-SQ_SIZE, 0):
+                    snakes2.head.surf.blit(snakes2.head_surfs[2][timer2], (0,0))
+                else:
+                    snakes2.head.surf.blit(snakes2.head_surfs[3][timer2], (0,0))
             if sd2:
                 for snake in snakes2.group:
                     snake.kill()
                 opt2, sd2 = False, False
-
+            
+            if got_hit:
+                for i in range(3):
+                    snakes.add_snake()
+                    got_hit = False
+            if got_hit2:
+                for i in range(3):
+                    snakes2.add_snake()
+                    got_hit2 = False
+            
             for fw in all_sprites:
                 self.screen.blit(fw.surf, fw.rect)
+            
+            for expl in expls:
+                expl.update_timer()
 
             pygame.display.flip()
             self.clock.tick(GAME_SPEED)
